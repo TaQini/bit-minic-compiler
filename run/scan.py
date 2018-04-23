@@ -5,6 +5,7 @@ import os
 import lxml
 import xml.etree.ElementTree as ET
 from lxml import etree # pretty_print
+__author__ = 'TaQini'
 
 # keyword in C
 keyword = ['auto', 'break', 'case', 'char', 'const', 'continue', 'default',
@@ -14,6 +15,7 @@ keyword = ['auto', 'break', 'case', 'char', 'const', 'continue', 'default',
 			'volatile', 'while', '_Alignas', '_Alignof', '_Atomic', '_Bool', 
 			'_Complex', '_Generic', '_Imaginary', '_Noreturn', '_Static_assert',
 			'_Therad_local']
+
 # separator and operator in C
 sep_op = ['[', ']', '(', ')', '{', '}', '.', '->', '++', '--', '&', '*', 
 			'+', '-', '~', '!', '/', '%', '<<', '>>', '<', '>', '<=', '>=',
@@ -67,21 +69,21 @@ def resolve(val):
 			else:
 				# match floating constant
 				dec_flt_constant = re.compile(
-						'[0-9]*\.[0-9]+[e|E][+|-]?[0-9]+[f|l|F|L]'	# dec -> fra exp suffix(opt)
-						'|[0-9]+\.[e|E][+|-]?[0-9]+[f|l|F|L]'
-						'|[0-9]*\.[0-9]+[f|l|F|L]'					# dec -> fra suffix(opt)
-						'|[0-9]+\.[f|l|F|L]'
-						'|[0-9]+[e|E][+|-]?[0-9]+[f|l|F|L]')		# dec -> dig exp suffix(opt)
+						'[0-9]*\.[0-9]+[e|E][+|-]?[0-9]+[f|l|F|L]?'	# dec -> fra exp suffix(opt)
+						'|[0-9]+\.[e|E][+|-]?[0-9]+[f|l|F|L]?'
+						'|[0-9]*\.[0-9]+[f|l|F|L]?'					# dec -> fra suffix(opt)
+						'|[0-9]+\.[f|l|F|L]?'
+						'|[0-9]+[e|E][+|-]?[0-9]+[f|l|F|L]?')		# dec -> dig exp suffix(opt)
 				hex_flt_constant = re.compile(
-						'0x[0-9a-f]*\.[0-9a-f]+p[+|-]?[0-9]+[f|l]'	# hex -> 0x fra exp suffix(opt)
-						'|0x[0-9a-f]+\.p[+|-]?[0-9]+[f|l]'
-						'|0x[0-9a-f]+p[+|-]?[0-9]+[f|l]',			# hex -> dig exp suffix(opt)
+						'0x[0-9a-f]*\.[0-9a-f]+p[+|-]?[0-9]+[f|l]?'	# hex -> 0x fra exp suffix(opt)
+						'|0x[0-9a-f]+\.p[+|-]?[0-9]+[f|l]?'
+						'|0x[0-9a-f]+p[+|-]?[0-9]+[f|l]?',			# hex -> dig exp suffix(opt)
 						re.I)										# Ignore case
 				if check(dec_flt_constant, val) or check(hex_flt_constant, val):
 					return ('constant_float', True)
 				else:
 					# match character constant
-					char_constant = re.compile("[L|u|U]?\'[^\\\'']+\'") # interesting :)
+					char_constant = re.compile("[L|u|U]?\'[^\\\']+\'") # interesting :)
 					if check(char_constant, val):
 						return ('constant_char', True)
 					else:
