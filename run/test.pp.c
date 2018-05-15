@@ -11,4 +11,7 @@ int main ( ) {
  char p [ ] = "234566432\n" ; 
  return a ; 
  float 4hat_is_wrong = 0x.p3f ; 
+ for ( a = 0 ; a < 3 ; a ++ ) { 
+ b ++ ; 
+ } 
  } 

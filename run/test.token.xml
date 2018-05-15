@@ -458,16 +458,142 @@
     </token>
     <token>
       <number>66</number>
-      <value>}</value>
-      <type>sep/operator</type>
+      <value>for</value>
+      <type>keyword</type>
       <line>14</line>
       <valid>True</valid>
     </token>
     <token>
       <number>67</number>
+      <value>(</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>68</number>
+      <value>a</value>
+      <type>identifer</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>69</number>
+      <value>=</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>70</number>
+      <value>0</value>
+      <type>constant_int</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>71</number>
+      <value>;</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>72</number>
+      <value>a</value>
+      <type>identifer</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>73</number>
+      <value>&lt;</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>74</number>
+      <value>3</value>
+      <type>constant_int</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>75</number>
+      <value>;</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>76</number>
+      <value>a</value>
+      <type>identifer</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>77</number>
+      <value>++</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>78</number>
+      <value>)</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>79</number>
+      <value>{</value>
+      <type>sep/operator</type>
+      <line>14</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>80</number>
+      <value>b</value>
+      <type>identifer</type>
+      <line>15</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>81</number>
+      <value>++</value>
+      <type>sep/operator</type>
+      <line>15</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>82</number>
+      <value>;</value>
+      <type>sep/operator</type>
+      <line>15</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>83</number>
+      <value>}</value>
+      <type>sep/operator</type>
+      <line>16</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>84</number>
+      <value>}</value>
+      <type>sep/operator</type>
+      <line>17</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>85</number>
       <value>#</value>
       <type>#</type>
-      <line>15</line>
+      <line>18</line>
       <valid>True</valid>
     </token>
   </tokens>
