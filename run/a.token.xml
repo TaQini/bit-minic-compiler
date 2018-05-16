@@ -101,21 +101,21 @@
     </token>
     <token>
       <number>15</number>
+      <value>;</value>
+      <type>sep/operator</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>16</number>
       <value>a</value>
       <type>identifer</type>
       <line>3</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>16</number>
-      <value>++</value>
-      <type>sep/operator</type>
-      <line>3</line>
-      <valid>True</valid>
-    </token>
-    <token>
       <number>17</number>
-      <value>;</value>
+      <value>++</value>
       <type>sep/operator</type>
       <line>3</line>
       <valid>True</valid>

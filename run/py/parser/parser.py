@@ -25,10 +25,9 @@ class rule:
 		self.follow = set()
 		if self.start:
 			self.follow.add('#')
-
 	def set_start(self):
 		self.start = True
-	def init_follow(self, g):
+	def init_follow(self, g): # create gram of follow
 		for X in self.right:
 			for i in range(len(X)): # rule: self -> X[0]X[1]...X[len]
 				if DEBUG: print "X[i] = " + str(X[i]), "i = " + str(i+1),"len = " + str(len(X))
@@ -86,11 +85,10 @@ class rule:
 	def show_follow(self):
 		print 'FOLLOW(' + self.left + ') =', self.follow
 	def show_rule(self, index):
-		print self.left, '->',
+		rst = self.left + ' -> '
 		for c in self.right[index]:
-			print c,
-		print '' 
-
+			rst += c + ' '
+		return rst
 class grammar:
 	def __init__(self, rules):
 		self.rules = rules
@@ -111,8 +109,8 @@ class grammar:
 		# init and update follow
 		for r in self.rules:
 			r.init_follow(self)
-		#for r in self.rules:
-		#	r.update_follow(self)
+		for r in self.rules:
+			r.update_follow(self)
 	def get_rule(self, s):
 		for rule in self.rules:
 			if rule.left == s:
@@ -156,11 +154,36 @@ def read_grammar(gramfile):
 	tmp.append(rule(S, gram[S], True))
 	rst = grammar(tmp)
 	return rst
-
-# create LL analyzing table
-def create_table():
-	pass
-
+# create LL analysis table
+class LL_table:
+	def __init__(self, g):
+		self.table = dict()
+		for rule in g.rules:
+			for P in rule.right:
+				for X in P: # P -> X0X1...Xn
+					if X in g.Vt:
+						self.table[(rule.left,X)] = rule.show_rule(rule.right.index(P))
+						break
+					elif X in g.Vn:
+						no_eps = True
+						for a in g.get_rule(X).first:
+							if a == 'epsilon':
+								no_eps = False
+							else:
+								self.table[(rule.left,a)] = rule.show_rule(rule.right.index(P))
+						if no_eps:
+							break
+				for X in P: # P -> X0X1...Xn
+					if X in g.Vt:
+						break
+					elif X in g.Vn:
+						if 'epsilon' not in g.get_rule(X).first:
+							break # if eps not all Xi.first, then eps not in X0X1...Xn.first
+					for b in rule.follow:
+						self.table[(rule.left,b)] = rule.show_rule(rule.right.index(P))
+	def show(self):
+		for i in self.table.keys():
+			print 'M('+i[0]+','+i[1]+') = '+self.table[i]
 # Entry point
 def main():
 	# init input string
@@ -168,10 +191,10 @@ def main():
 
 	# init production rules, FIRST, FOLLOW
 	g = read_grammar('./grammar')
-	for r in g.rules: r.show_first()
-	print ''
-	for r in g.rules: r.show_follow()
-	
+	#for r in g.rules: r.show_first()
+	#for r in g.rules: r.show_follow()
+	t = LL_table(g)
+	#t.show()
+
 if __name__ == "__main__":
 	main()
-
