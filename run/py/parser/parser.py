@@ -2,25 +2,66 @@
 # LL(1)
 import xml.etree.cElementTree as ET 
 __author__ = 'TaQini'
-
+DEBUG = False
 # production rule
 class rule:
-	def __init__(self, left, right):
+	def __init__(self, left, right, start):
+		self.start = start
 		self.left = left
 		self.right = right
 		self.first = set()
-		self.follow = set()
-		# init first
+		# init FIRST
 		for i in right:
 			for c in i:
 				if c != 'epsilon':
 					self.first.add(c)
-					eps = 0
+					eps = False
 					break
 				else:
-					eps = 1
-			if eps == 1:
+					eps = True
+			if eps:
 				self.first.add('epsilon')
+		# init FOLLOW
+		self.follow = set()
+		if self.start:
+			self.follow.add('#')
+
+	def set_start(self):
+		self.start = True
+	def init_follow(self, g):
+		for X in self.right:
+			for i in range(len(X)): # rule: self -> X[0]X[1]...X[len]
+				if DEBUG: print "X[i] = " + str(X[i]), "i = " + str(i+1),"len = " + str(len(X))
+				if X[i] in (g.Vt | {'epsilon'}):
+					pass
+				elif X[i] in g.Vn:
+					if i == len(X)-1: # no X[i+1]
+						if DEBUG: self.show_rule(self.right.index(X))
+						if X[i] != self.left :
+							g.get_rule(X[i]).follow.add(self.left)
+							if DEBUG: print "FOLLOW " + str(self.left) + "--> FOLLOW " + str(X[i])
+					else: # has X[i+1]
+						if DEBUG: print "have rest string:"
+						eps = True
+						for j in range(i+1,len(X)): # the rest
+							if DEBUG: print X[j]
+							if X[j] in g.Vt:
+								g.get_rule(X[i]).follow.add(X[j])
+								eps = False
+								continue
+							if ['epsilon'] in g.get_rule(X[j]).right: # X[j] => epsilon
+								if DEBUG: g.get_rule(X[j]).show_rule(g.get_rule(X[j]).right.index(['epsilon']))
+								if DEBUG: g.get_rule(X[j]).show_first()
+								if len(g.get_rule(X[j]).right) > 1:
+									g.get_rule(X[i]).follow = g.get_rule(X[i]).follow | (g.get_rule(X[j]).first - {'epsilon'})
+							else:
+								eps = False
+								g.get_rule(X[i]).follow = g.get_rule(X[i]).follow | (g.get_rule(X[j]).first - {'epsilon'})
+						if eps: # rest => eps
+							if DEBUG: self.show_rule(self.right.index(X))
+							if X[i] != self.left :
+								g.get_rule(X[i]).follow.add(self.left)
+								if DEBUG: print "FOLLOW " + str(self.left) + "--> FOLLOW " + str(X[i])
 	def update_first(self, g):
 		while True:
 			tmp = self.first & g.Vn
@@ -31,19 +72,24 @@ class rule:
 				self.first.remove(i)
 				self.first = self.first | r.first
 	def update_follow(self, g):
-		if g.rules[0].left == self.left:
-			self.follow.add('#')
+		while True:
+			tmp = self.follow & g.Vn
+			for i in tmp:
+				r = g.get_rule(i)
+				self.follow = self.follow | r.follow 
+			new_tmp = self.follow & g.Vn
+			if new_tmp == tmp:
+				break
+		self.follow = self.follow - g.Vn
 	def show_first(self):
-		print self.left, self.first
+		print 'FIRST(' + self.left + ') =', self.first
 	def show_follow(self):
-		print self.left, self.follow
-	def show_rules(self):
-		print self.left,'->',
-		for i in self.right:
-			for c in i:
-				print c,
-			print '|',
-		print '\b\b', ''
+		print 'FOLLOW(' + self.left + ') =', self.follow
+	def show_rule(self, index):
+		print self.left, '->',
+		for c in self.right[index]:
+			print c,
+		print '' 
 
 class grammar:
 	def __init__(self, rules):
@@ -62,8 +108,11 @@ class grammar:
 		# update first
 		for r in self.rules:
 			r.update_first(self)
+		# init and update follow
 		for r in self.rules:
-			r.update_follow(self)
+			r.init_follow(self)
+		#for r in self.rules:
+		#	r.update_follow(self)
 	def get_rule(self, s):
 		for rule in self.rules:
 			if rule.left == s:
@@ -88,7 +137,7 @@ def read_XML(xmlfile):
 	rst = [r(t.find("value").text, t.find("type").text) for t in root.iter("token")]
 	return rst
 
-# grammar file -> grammar list, Vn & Vt
+# grammar file -> grammar obj (include rules, Vn & Vt)
 def read_grammar(gramfile):
 	with open(gramfile,'r') as f:
 		g = [line[:-1] for line in f.readlines() if '->' in line and line[0] != '#']
@@ -101,7 +150,11 @@ def read_grammar(gramfile):
 			gram[l].append(r)
 		else:
 			gram[l] = [r,]
-	rst = grammar([rule(k, gram[k]) for k in gram.keys()])
+	# start symbol
+	S = g[0].split()[0]
+	tmp = [rule(k, gram[k], False) for k in gram.keys() if k != S]
+	tmp.append(rule(S, gram[S], True))
+	rst = grammar(tmp)
 	return rst
 
 # create LL analyzing table
@@ -115,8 +168,8 @@ def main():
 
 	# init production rules, FIRST, FOLLOW
 	g = read_grammar('./grammar')
-
 	for r in g.rules: r.show_first()
+	print ''
 	for r in g.rules: r.show_follow()
 	
 if __name__ == "__main__":

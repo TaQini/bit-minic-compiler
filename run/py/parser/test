@@ -1,0 +1,11 @@
+S -> A B 
+S -> b C
+A -> b
+A -> epsilon
+B -> a D
+B -> epsilon
+C -> A D
+C -> b
+D -> a S
+D -> c
+
