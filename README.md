@@ -11,13 +11,16 @@ Shuofu Ning, 2016-2017<br>
 YiFan Wu, 2015-2016
 
 # TaQini's Code
-./run/scan.py - scanner
+./run/py/scanner/scan.py - scanner
+./run/py/parser/parser.py - parser
+
 ## usage 
 ```
 $ cd ./run
 $ cp ./py.xml ./config.xml 
 $ ./run.sh test.c
 ```
+
 ## output
 `test.pp.c` - generate by pp
 `test.token.xml` - generate by scanner
