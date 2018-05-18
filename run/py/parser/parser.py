@@ -3,6 +3,7 @@
 import xml.etree.cElementTree as ET 
 __author__ = 'TaQini'
 DEBUG = False
+TEST  = True
 # production rule
 class rule:
 	def __init__(self, left, right, start):
@@ -116,8 +117,8 @@ class grammar:
 			if rule.left == s:
 				return rule
 
-# input string
-class r: 
+# char in input string
+class char: 
 	def __init__(self, value, typ):
 		self.type = typ
 		self.value = value
@@ -127,12 +128,25 @@ class r:
 			self.text = 'CONST'
 		else:
 			self.text = value
+# input string
+class string:
+	def __init__(self, r):
+		self.r = r
+	def show(self):
+		rst = ''
+		for c in self.r:
+			rst += c.text + ' '
+		return rst
+	def move(self):
+		self.r.pop(0)
+	def p(self):
+		return self.r[0].text
 
 # xml file -> input string
 def read_XML(xmlfile):
 	tree = ET.ElementTree(file = xmlfile)
 	root = tree.getroot()
-	rst = [r(t.find("value").text, t.find("type").text) for t in root.iter("token")]
+	rst = string([char(t.find("value").text, t.find("type").text) for t in root.iter("token")])
 	return rst
 
 # grammar file -> grammar obj (include rules, Vn & Vt)
@@ -162,7 +176,7 @@ class LL_table:
 			for P in rule.right:
 				for X in P: # P -> X0X1...Xn
 					if X in g.Vt:
-						self.table[(rule.left,X)] = rule.show_rule(rule.right.index(P))
+						self.table[(rule.left,X)] = (rule, rule.right.index(P))
 						break
 					elif X in g.Vn:
 						no_eps = True
@@ -170,7 +184,7 @@ class LL_table:
 							if a == 'epsilon':
 								no_eps = False
 							else:
-								self.table[(rule.left,a)] = rule.show_rule(rule.right.index(P))
+								self.table[(rule.left,a)] = (rule, rule.right.index(P))
 						if no_eps:
 							break
 				for X in P: # P -> X0X1...Xn
@@ -180,14 +194,40 @@ class LL_table:
 						if 'epsilon' not in g.get_rule(X).first:
 							break # if eps not all Xi.first, then eps not in X0X1...Xn.first
 					for b in rule.follow:
-						self.table[(rule.left,b)] = rule.show_rule(rule.right.index(P))
+						self.table[(rule.left,b)] = (rule, rule.right.index(P))
 	def show(self):
 		for i in self.table.keys():
 			print 'M('+i[0]+','+i[1]+') = '+self.table[i]
+	def query(self, Vn, Vt):
+		return self.table[(Vn,Vt)]
+
+class stack:
+	def __init__(self, g):
+		for rule in g.rules:
+			if rule.start:
+				S = rule.left
+				break
+		self.s = ['#',S]
+	def pop(self):
+		return self.s.pop(-1)
+	def push(self, l):
+		self.s.extend(l[::-1])
+		if 'epsilon' in self.s:
+			self.s.remove('epsilon')
+	def show(self):
+		rst = ''
+		for i in self.s:
+			rst += i + ' '
+		return rst
+
 # Entry point
 def main():
 	# init input string
 	r = read_XML('./a.token.xml')
+	
+	# test input string
+	if TEST:
+		r = string([char(i,'dd') for i in list('i+i*i#')])
 
 	# init production rules, FIRST, FOLLOW
 	g = read_grammar('./grammar')
@@ -195,6 +235,28 @@ def main():
 	#for r in g.rules: r.show_follow()
 	t = LL_table(g)
 	#t.show()
+
+	# init analysis stack
+	s = stack(g)
+	
+	i = 1
+	while True:
+		print i,'\t',s.show(),'\t',r.show(),
+		tmp = s.pop()
+		if tmp in g.Vt | {'#'}:
+			if tmp == r.p():
+				if tmp == '#':
+					print 'done'
+					break
+				else:
+					r.move()
+			action = 'p++'
+		else:
+			rule, index = t.query(tmp, r.p())
+			action = rule.show_rule(index)
+			s.push(rule.right[index])
+		print action
+		i += 1
 
 if __name__ == "__main__":
 	main()
