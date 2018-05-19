@@ -16,9 +16,10 @@ TYPE_SPEC -> float
 TYPE_SPEC -> double
 
 # 参数列表
-ARG_LIST -> ARGUMENT
-ARG_LIST -> ARGUMENT , ARG_LIST
+ARG_LIST -> ARGUMENT ARG_LIST'
 ARG_LIST -> epsilon
+ARG_LIST' -> , ARG_LIST
+ARG_LIST' -> epsilon
 
 # 参数
 ARGUMENT -> TYPE_SPEC ID
@@ -45,14 +46,14 @@ DECL_STMT' -> = EXPR
 DECL_STMT' -> epsilon
 
 # 返回语句
-RTN_STMT -> return EXPR
+RTN_STMT -> return EXPR ;
 
 # 赋值语句
-ASSIGN_STMT -> ID = EXPR
+ASSIGN_STMT -> ID = EXPR ;
 
 # 循环语句 for, while
 ITER_STMT -> for ( STMT ; STMT ; STMT ) CODE_BLOCK 
-ITER_STMT -> for ( STMT ; STMT ; STMT ) STMT
+# ITER_STMT -> for ( STMT ; STMT ; STMT ) STMT
 # ITER_STMT -> while ( STMT ) CODE_BLOCK
 # ITER_STMT -> while ( STMT ) STMT
 # ITER_STMT -> do STMT while ( STMT )
@@ -60,20 +61,20 @@ ITER_STMT -> for ( STMT ; STMT ; STMT ) STMT
 
 # 分支语句 if-else
 SLCT_STMT -> if ( STMT ) CODE_BLOCK
-SLCT_STMT -> if ( STMT ) STMT
+# SLCT_STMT -> if ( STMT ) STMT
 # SLCT_STMT -> if ( STMT ) STMT else CODE_BLOCK
 # SLCT_STMT -> if ( STMT ) STMT else STMT
 # SLCT_STMT -> if ( STMT ) CODE_BLOCK else CODE_BLOCK
 # SLCT_STMT -> if ( STMT ) CODE_BLOCK else STMT
 
 # 比较语句
-CMP_STMT -> EXPR OP EXPR
-CMP_OP ->  >
-CMP_OP ->  <
-CMP_OP ->  >=
-CMP_OP ->  <=
-CMP_OP ->  ==
-CMP_OP ->  !=
+#CMP_STMT -> EXPR OP EXPR
+#CMP_OP ->  >
+#CMP_OP ->  <
+#CMP_OP ->  >=
+#CMP_OP ->  <=
+#CMP_OP ->  ==
+#CMP_OP ->  !=
 #CMP_STMT -> EXPR > EXPR
 #CMP_STMT -> EXPR < EXPR
 #CMP_STMT -> EXPR >= EXPR

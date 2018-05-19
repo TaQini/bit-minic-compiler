@@ -1,9 +1,9 @@
-E -> T E'
-E' -> + T E'
-E' -> epsilon
-T -> F T'
-T' -> * F T'
-T' -> epsilon
+E -> T E1
+E1 -> + T E1
+E1 -> epsilon
+T -> F T1
+T1 -> * F T1
+T1 -> epsilon
 F -> ( E )
 F -> i
 

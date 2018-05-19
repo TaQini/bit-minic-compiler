@@ -1,9 +1,11 @@
 #!/usr/bin/python
 # LL(1)
-import xml.etree.cElementTree as ET 
+import xml.etree.ElementTree as ET 
+from lxml import etree
+import xlwt
+import sys
 __author__ = 'TaQini'
 DEBUG = False
-TEST  = True
 # production rule
 class rule:
 	def __init__(self, left, right, start):
@@ -11,7 +13,7 @@ class rule:
 		self.left = left
 		self.right = right
 		self.first = set()
-		# init FIRST
+		# init FIRST-set: relation diagram of first-set
 		for i in right:
 			for c in i:
 				if c != 'epsilon':
@@ -22,13 +24,11 @@ class rule:
 					eps = True
 			if eps:
 				self.first.add('epsilon')
-		# init FOLLOW
+		# init FOLLOW-set
 		self.follow = set()
 		if self.start:
 			self.follow.add('#')
-	def set_start(self):
-		self.start = True
-	def init_follow(self, g): # create gram of follow
+	def init_follow(self, g): # relation diagram of follow-set
 		for X in self.right:
 			for i in range(len(X)): # rule: self -> X[0]X[1]...X[len]
 				if DEBUG: print "X[i] = " + str(X[i]), "i = " + str(i+1),"len = " + str(len(X))
@@ -90,6 +90,9 @@ class rule:
 		for c in self.right[index]:
 			rst += c + ' '
 		return rst
+	def set_start(self):
+		self.start = True
+# grammar - a set of rules
 class grammar:
 	def __init__(self, rules):
 		self.rules = rules
@@ -116,8 +119,7 @@ class grammar:
 		for rule in self.rules:
 			if rule.left == s:
 				return rule
-
-# char in input string
+# char in input stream
 class char: 
 	def __init__(self, value, typ):
 		self.type = typ
@@ -128,8 +130,8 @@ class char:
 			self.text = 'CONST'
 		else:
 			self.text = value
-# input string
-class string:
+# input stream
+class stream:
 	def __init__(self, r):
 		self.r = r
 	def show(self):
@@ -140,35 +142,8 @@ class string:
 	def move(self):
 		self.r.pop(0)
 	def p(self):
-		return self.r[0].text
-
-# xml file -> input string
-def read_XML(xmlfile):
-	tree = ET.ElementTree(file = xmlfile)
-	root = tree.getroot()
-	rst = string([char(t.find("value").text, t.find("type").text) for t in root.iter("token")])
-	return rst
-
-# grammar file -> grammar obj (include rules, Vn & Vt)
-def read_grammar(gramfile):
-	with open(gramfile,'r') as f:
-		g = [line[:-1] for line in f.readlines() if '->' in line and line[0] != '#']
-	gram = dict()
-	for line in g:
-		l,r = line.split('->')
-		l = l.split()[0]
-		r = r.split()
-		if l in gram.keys():
-			gram[l].append(r)
-		else:
-			gram[l] = [r,]
-	# start symbol
-	S = g[0].split()[0]
-	tmp = [rule(k, gram[k], False) for k in gram.keys() if k != S]
-	tmp.append(rule(S, gram[S], True))
-	rst = grammar(tmp)
-	return rst
-# create LL analysis table
+		return (self.r[0].text, self.r[0].value)
+# create LL(1) parsing table
 class LL_table:
 	def __init__(self, g):
 		self.table = dict()
@@ -176,7 +151,14 @@ class LL_table:
 			for P in rule.right:
 				for X in P: # P -> X0X1...Xn
 					if X in g.Vt:
+						if DEBUG and (rule.left,X) in self.table.keys(): 
+							print "!!!!! not LL1 grammar"
+							rle, idx = self.table[(rule.left,X)]
+							print rle.show_rule(idx)
+							print rule.show_rule(rule.right.index(P))
+							print "#####"
 						self.table[(rule.left,X)] = (rule, rule.right.index(P))
+							
 						break
 					elif X in g.Vn:
 						no_eps = True
@@ -184,6 +166,12 @@ class LL_table:
 							if a == 'epsilon':
 								no_eps = False
 							else:
+								if DEBUG and (rule.left,a) in self.table.keys(): 
+									print "!!!!! not LL1 grammar"
+									rle, idx = self.table[(rule.left,a)]
+									print rle.show_rule(idx)
+									print rule.show_rule(rule.right.index(P))
+									print "#####"
 								self.table[(rule.left,a)] = (rule, rule.right.index(P))
 						if no_eps:
 							break
@@ -194,13 +182,25 @@ class LL_table:
 						if 'epsilon' not in g.get_rule(X).first:
 							break # if eps not all Xi.first, then eps not in X0X1...Xn.first
 					for b in rule.follow:
+						if DEBUG and (rule.left,b) in self.table.keys(): 
+							print "!!!!! not LL1 grammar"
+							rle, idx = self.table[(rule.left,b)]
+							print rle.show_rule(idx)
+							print rule.show_rule(rule.right.index(P))
+							print "#####"
 						self.table[(rule.left,b)] = (rule, rule.right.index(P))
 	def show(self):
 		for i in self.table.keys():
-			print 'M('+i[0]+','+i[1]+') = '+self.table[i]
+			rule, index = self.table[i]
+			print 'M('+i[0]+', '+i[1]+') = '+ rule.show_rule(index)
 	def query(self, Vn, Vt):
-		return self.table[(Vn,Vt)]
-
+		try:
+			rst = self.table[(Vn,Vt)]
+		except KeyError, err:
+			error(err)
+		else:
+			return rst
+# LL(1) parsing stack
 class stack:
 	def __init__(self, g):
 		for rule in g.rules:
@@ -219,44 +219,116 @@ class stack:
 		for i in self.s:
 			rst += i + ' '
 		return rst
+# parser tree 
+class tree:
+	def __init__(self, root):
+		self.root = root
+		self.children = []
+	def add_children(self, children):
+		pass
 
+# INPUT: xml file -> input stream object
+def read_XML(xmlfile):
+	tree = ET.ElementTree(file = xmlfile)
+	root = tree.getroot()
+	rst = stream([char(t.find("value").text, t.find("type").text) for t in root.iter("token")])
+	return rst
+# INPUT: grammar file -> grammar object
+def read_grammar(gramfile):
+	with open(gramfile,'r') as f:
+		g = [line[:-1] for line in f.readlines() if '->' in line and line[0] != '#']
+	gram = dict()
+	for line in g:
+		l,r = line.split('->')
+		l = l.split()[0]
+		r = r.split()
+		if l in gram.keys():
+			gram[l].append(r)
+		else:
+			gram[l] = [r,]
+	# start symbol
+	S = g[0].split()[0]
+	tmp = [rule(k, gram[k], False) for k in gram.keys() if k != S]
+	tmp.append(rule(S, gram[S], True))
+	rst = grammar(tmp)
+	return rst
+# Error handler
+def error(err):
+	print '[!] ERROR:', 
+	print 'missing M('+err[0][0]+', '+err[0][1]+')'
+	exit()
+def get_element(l, tag):
+	for ele in l:
+		if ele.tag == tag:
+			return ele
 # Entry point
 def main():
-	# init input string
-	r = read_XML('./a.token.xml')
-	
-	# test input string
-	if TEST:
-		r = string([char(i,'dd') for i in list('i+i*i#')])
-
-	# init production rules, FIRST, FOLLOW
+	# init input stream
+	r = read_XML(sys.argv[1]) # iFile
+	r = stream([char(i, 'a') for i in "i+i*i#"])
+	# init production rules
 	g = read_grammar('./grammar')
-	#for r in g.rules: r.show_first()
-	#for r in g.rules: r.show_follow()
+	# init LL(1) parsing table
 	t = LL_table(g)
-	#t.show()
-
-	# init analysis stack
+	# init LL(1) parsing stack
 	s = stack(g)
-	
-	i = 1
+	# init List of parsing procedure
+	output = [['step', 'stack', 'rest string', 'action']]
+	step = 1
+
+	new_xml = ET.Element("ParserTree",attrib={"name":sys.argv[1].split('.')[0]+'.tree.xml'})
+	l = [new_xml,]
+	# mainloop 
 	while True:
-		print i,'\t',s.show(),'\t',r.show(),
+		line = [step, s.show(), r.show()]
 		tmp = s.pop()
 		if tmp in g.Vt | {'#'}:
-			if tmp == r.p():
+			text, value = r.p()
+			if tmp == text:
 				if tmp == '#':
-					print 'done'
+					line.append('done')
+					output.append(line)
 					break
 				else:
 					r.move()
-			action = 'p++'
+			if text in ['ID', 'CONST']:
+				action = 'pop '+text+'('+value+'), p++'
+			else:
+				action = 'pop '+text+', p++'
 		else:
-			rule, index = t.query(tmp, r.p())
+			rule, index = t.query(tmp, r.p()[0])
+			if rule.start:
+				l.append(ET.SubElement(new_xml, rule.left))
+				l[-1].text = 'test'
+			for item in rule.right[index]:
+				l.append(ET.SubElement(get_element(l, rule.left), item))
+				l[-1].text = 'test'
+
 			action = rule.show_rule(index)
 			s.push(rule.right[index])
-		print action
-		i += 1
+			
+		line.append(action)
+		step += 1
+		output.append(line)
+
+	# OUTPUT: parsing tree in xml format
+	for i in l:
+		print i.tag
+
+	et = ET.ElementTree(new_xml)
+	print et
+	print et.getroot()
+	tmp = ET.tostring(et.getroot())
+	#root = etree.fromstring(tmp)
+	#res = etree.tostring(root, pretty_print=True)
+	print tmp
+	# OUTPUT: parsing procedure in xls format
+	workbook = xlwt.Workbook()
+	sheet1 = workbook.add_sheet('sheet1',cell_overwrite_ok=True)
+	for r in range(len(output)):
+		for c in range(len(line)):
+			sheet1.write(r,c,output[r][c])
+	workbook.save('./a.xls')
 
 if __name__ == "__main__":
 	main()
