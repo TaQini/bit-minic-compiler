@@ -258,14 +258,15 @@ def error(err):
 	print 'missing M('+err[0][0]+', '+err[0][1]+')'
 	exit()
 def get_element(l, tag):
-	for ele in l:
+	for ele in l[::-1]:
 		if ele.tag == tag:
 			return ele
+
 # Entry point
 def main():
 	# init input stream
 	r = read_XML(sys.argv[1]) # iFile
-	r = stream([char(i, 'a') for i in "i+i*i#"])
+	r = stream([char(i, 'a') for i in "iaimi#"])
 	# init production rules
 	g = read_grammar('./grammar')
 	# init LL(1) parsing table
@@ -299,10 +300,8 @@ def main():
 			rule, index = t.query(tmp, r.p()[0])
 			if rule.start:
 				l.append(ET.SubElement(new_xml, rule.left))
-				l[-1].text = 'test'
 			for item in rule.right[index]:
 				l.append(ET.SubElement(get_element(l, rule.left), item))
-				l[-1].text = 'test'
 
 			action = rule.show_rule(index)
 			s.push(rule.right[index])
@@ -319,9 +318,11 @@ def main():
 	print et
 	print et.getroot()
 	tmp = ET.tostring(et.getroot())
-	#root = etree.fromstring(tmp)
-	#res = etree.tostring(root, pretty_print=True)
-	print tmp
+	root = etree.fromstring(tmp)
+	res = etree.tostring(root, pretty_print=True)
+	with open('a.xml', 'w+') as f:
+		f.write(res)
+	
 	# OUTPUT: parsing procedure in xls format
 	workbook = xlwt.Workbook()
 	sheet1 = workbook.add_sheet('sheet1',cell_overwrite_ok=True)
