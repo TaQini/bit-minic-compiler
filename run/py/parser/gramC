@@ -16,10 +16,10 @@ TYPE_SPEC -> float
 TYPE_SPEC -> double
 
 # 参数列表
-ARG_LIST -> ARGUMENT ARG_LIST'
+ARG_LIST -> ARGUMENT ARG_LIST1
 ARG_LIST -> epsilon
-ARG_LIST' -> , ARG_LIST
-ARG_LIST' -> epsilon
+ARG_LIST1 -> , ARG_LIST
+ARG_LIST1 -> epsilon
 
 # 参数
 ARGUMENT -> TYPE_SPEC ID
@@ -41,9 +41,9 @@ STMT -> CMP_STMT
 # STMT -> CALL_STMT
 
 # 变量声明语句
-DECL_STMT -> TYPE_SPEC ID DECL_STMT' ;
-DECL_STMT' -> = EXPR
-DECL_STMT' -> epsilon
+DECL_STMT -> TYPE_SPEC ID DECL_STMT1 ;
+DECL_STMT1 -> = EXPR
+DECL_STMT1 -> epsilon
 
 # 返回语句
 RTN_STMT -> return EXPR ;
@@ -99,4 +99,3 @@ TERM2 -> epsilon
 FACTOR -> ID
 FACTOR -> CONST
 FACTOR -> ( EXPR )
-

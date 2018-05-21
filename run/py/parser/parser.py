@@ -122,27 +122,29 @@ class grammar:
 # char in input stream
 class char: 
 	def __init__(self, value, typ):
-		self.type = typ
 		self.value = value
 		if typ == "identifer": 
-			self.text = 'ID'
+			self.type = 'ID'
 		elif 'constant' in typ: 
-			self.text = 'CONST'
+			self.type = 'CONST'
 		else:
-			self.text = value
+			self.type = value
 # input stream
 class stream:
 	def __init__(self, r):
 		self.r = r
+		self.d = {}
+		for i in r:
+			self.d[i.value] = i.type
 	def show(self):
 		rst = ''
 		for c in self.r:
-			rst += c.text + ' '
+			rst += c.value + ' '
 		return rst
 	def move(self):
 		self.r.pop(0)
 	def p(self):
-		return (self.r[0].text, self.r[0].value)
+		return self.r[0].value
 # create LL(1) parsing table
 class LL_table:
 	def __init__(self, g):
@@ -266,7 +268,7 @@ def get_element(l, tag):
 def main():
 	# init input stream
 	r = read_XML(sys.argv[1]) # iFile
-	r = stream([char(i, 'a') for i in "iaimi#"])
+	# r = stream([char(i, 'a') for i in "iaimi#"])
 	# init production rules
 	g = read_grammar('./grammar')
 	# init LL(1) parsing table
@@ -284,25 +286,26 @@ def main():
 		line = [step, s.show(), r.show()]
 		tmp = s.pop()
 		if tmp in g.Vt | {'#'}:
-			text, value = r.p()
-			if tmp == text:
+			text = r.p()
+			if tmp == r.d[text]:
 				if tmp == '#':
 					line.append('done')
 					output.append(line)
 					break
 				else:
 					r.move()
-			if text in ['ID', 'CONST']:
-				action = 'pop '+text+'('+value+'), p++'
-			else:
-				action = 'pop '+text+', p++'
+					get_element(l, tmp).text = r.p()
+			action = 'pop \''+r.d[text]+'\':\''+text+'\', p++'
 		else:
-			rule, index = t.query(tmp, r.p()[0])
+			rule, index = t.query(tmp, r.d[r.p()])
 			if rule.start:
 				l.append(ET.SubElement(new_xml, rule.left))
-			for item in rule.right[index]:
+			for item in rule.right[index][::-1]:
+				if item == 'epsilon':
+					continue
 				l.append(ET.SubElement(get_element(l, rule.left), item))
-
+				#if item in g.Vt:
+				#	l[-1].text = item
 			action = rule.show_rule(index)
 			s.push(rule.right[index])
 			
@@ -315,14 +318,14 @@ def main():
 		print i.tag
 
 	et = ET.ElementTree(new_xml)
-	print et
-	print et.getroot()
+	#print et
+	#print et.getroot()
 	tmp = ET.tostring(et.getroot())
-	root = etree.fromstring(tmp)
-	res = etree.tostring(root, pretty_print=True)
-	with open('a.xml', 'w+') as f:
-		f.write(res)
-	
+	#root = etree.fromstring(tmp)
+	#res = etree.tostring(root, pretty_print=True)
+	#with open('a.xml', 'w+') as f:
+	#	f.write(res)
+	#print tmp
 	# OUTPUT: parsing procedure in xls format
 	workbook = xlwt.Workbook()
 	sheet1 = workbook.add_sheet('sheet1',cell_overwrite_ok=True)
