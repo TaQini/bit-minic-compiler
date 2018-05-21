@@ -94,7 +94,7 @@ def resolve(val):
 						else:
 							# match separator or operator
 							if val in sep_op:
-								return ('sep/operator', True)
+								return ('Sep_or_Operator', True)
 							else:
 								# other vocabulary -> WRONG!
 								return ('unknown', False)

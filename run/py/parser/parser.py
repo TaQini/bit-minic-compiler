@@ -123,19 +123,20 @@ class grammar:
 class char: 
 	def __init__(self, value, typ):
 		self.value = value
+		self.type = typ
 		if typ == "identifer": 
-			self.type = 'ID'
+			self.text = 'ID'
 		elif 'constant' in typ: 
-			self.type = 'CONST'
+			self.text = 'CONST'
 		else:
-			self.type = value
+			self.text = value
 # input stream
 class stream:
 	def __init__(self, r):
 		self.r = r
 		self.d = {}
 		for i in r:
-			self.d[i.value] = i.type
+			self.d[i.value] = (i.text, i.type)
 	def show(self):
 		rst = ''
 		for c in self.r:
@@ -221,14 +222,6 @@ class stack:
 		for i in self.s:
 			rst += i + ' '
 		return rst
-# parser tree 
-class tree:
-	def __init__(self, root):
-		self.root = root
-		self.children = []
-	def add_children(self, children):
-		pass
-
 # INPUT: xml file -> input stream object
 def read_XML(xmlfile):
 	tree = ET.ElementTree(file = xmlfile)
@@ -259,11 +252,11 @@ def error(err):
 	print '[!] ERROR:', 
 	print 'missing M('+err[0][0]+', '+err[0][1]+')'
 	exit()
+# symbol to ET.Element
 def get_element(l, tag):
 	for ele in l[::-1]:
 		if ele.tag == tag:
 			return ele
-
 # Entry point
 def main():
 	# init input stream
@@ -277,62 +270,64 @@ def main():
 	s = stack(g)
 	# init List of parsing procedure
 	output = [['step', 'stack', 'rest string', 'action']]
+	# init step
 	step = 1
-
+	# init parser tree
 	new_xml = ET.Element("ParserTree",attrib={"name":sys.argv[1].split('.')[0]+'.tree.xml'})
+	# init List of each element in parser tree
 	l = [new_xml,]
+
 	# mainloop 
 	while True:
 		line = [step, s.show(), r.show()]
 		tmp = s.pop()
 		if tmp in g.Vt | {'#'}:
 			text = r.p()
-			if tmp == r.d[text]:
+			if tmp == r.d[text][0]:
 				if tmp == '#':
 					line.append('done')
 					output.append(line)
 					break
 				else:
+					if r.d[text][0] in ['ID', 'CONST']:
+						get_element(l, r.d[text][0]).text = r.p()
 					r.move()
-					get_element(l, tmp).text = r.p()
-			action = 'pop \''+r.d[text]+'\':\''+text+'\', p++'
+			action = 'pop \''+r.d[text][0]+'\':\''+text+'\', p++'
 		else:
-			rule, index = t.query(tmp, r.d[r.p()])
+			rule, index = t.query(tmp, r.d[r.p()][0])
 			if rule.start:
 				l.append(ET.SubElement(new_xml, rule.left))
 			for item in rule.right[index][::-1]:
 				if item == 'epsilon':
 					continue
-				l.append(ET.SubElement(get_element(l, rule.left), item))
-				#if item in g.Vt:
-				#	l[-1].text = item
+				if item in g.Vn:
+					l.append(ET.SubElement(get_element(l, rule.left), item))
+				if item in ['ID', 'CONST']:
+					l.append(ET.SubElement(get_element(l, rule.left), item))
+					#l[-1].text = item
+				elif item in g.Vt:
+					l.append(ET.SubElement(get_element(l, rule.left), r.d[item][1]))
+					l[-1].text = r.d[item][0]
 			action = rule.show_rule(index)
-			s.push(rule.right[index])
-			
+			s.push(rule.right[index])			
 		line.append(action)
 		step += 1
 		output.append(line)
 
 	# OUTPUT: parsing tree in xml format
-	for i in l:
-		print i.tag
-
 	et = ET.ElementTree(new_xml)
-	#print et
-	#print et.getroot()
 	tmp = ET.tostring(et.getroot())
-	#root = etree.fromstring(tmp)
-	#res = etree.tostring(root, pretty_print=True)
-	#with open('a.xml', 'w+') as f:
-	#	f.write(res)
-	#print tmp
+	root = etree.fromstring(tmp)
+	res = etree.tostring(root, pretty_print=True)
+	with open(sys.argv[1].split('.')[0]+'.tree.xml', 'w+') as f:
+		f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+		f.write(res)
 	# OUTPUT: parsing procedure in xls format
 	workbook = xlwt.Workbook()
 	sheet1 = workbook.add_sheet('sheet1',cell_overwrite_ok=True)
 	for r in range(len(output)):
 		for c in range(len(line)):
 			sheet1.write(r,c,output[r][c])
-	workbook.save('./a.xls')
-
+	workbook.save(sys.argv[1].split('.')[0]+'.xls')
 if __name__ == "__main__":
 	main()
