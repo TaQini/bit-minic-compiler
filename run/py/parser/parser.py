@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# LL(1)
 import xml.etree.ElementTree as ET 
 from lxml import etree
 import xlwt
 import sys
 __author__ = 'TaQini'
-DEBUG = False
 # production rule
 class rule:
 	def __init__(self, left, right, start):
@@ -31,37 +29,28 @@ class rule:
 	def init_follow(self, g): # relation diagram of follow-set
 		for X in self.right:
 			for i in range(len(X)): # rule: self -> X[0]X[1]...X[len]
-				if DEBUG: print "X[i] = " + str(X[i]), "i = " + str(i+1),"len = " + str(len(X))
 				if X[i] in (g.Vt | {'epsilon'}):
 					pass
 				elif X[i] in g.Vn:
 					if i == len(X)-1: # no X[i+1]
-						if DEBUG: self.show_rule(self.right.index(X))
 						if X[i] != self.left :
 							g.get_rule(X[i]).follow.add(self.left)
-							if DEBUG: print "FOLLOW " + str(self.left) + "--> FOLLOW " + str(X[i])
 					else: # has X[i+1]
-						if DEBUG: print "have rest string:"
 						eps = True
 						for j in range(i+1,len(X)): # the rest
-							if DEBUG: print X[j]
 							if X[j] in g.Vt:
 								g.get_rule(X[i]).follow.add(X[j])
 								eps = False
 								continue
 							if ['epsilon'] in g.get_rule(X[j]).right: # X[j] => epsilon
-								if DEBUG: g.get_rule(X[j]).show_rule(g.get_rule(X[j]).right.index(['epsilon']))
-								if DEBUG: g.get_rule(X[j]).show_first()
 								if len(g.get_rule(X[j]).right) > 1:
 									g.get_rule(X[i]).follow = g.get_rule(X[i]).follow | (g.get_rule(X[j]).first - {'epsilon'})
 							else:
 								eps = False
 								g.get_rule(X[i]).follow = g.get_rule(X[i]).follow | (g.get_rule(X[j]).first - {'epsilon'})
 						if eps: # rest => eps
-							if DEBUG: self.show_rule(self.right.index(X))
 							if X[i] != self.left :
 								g.get_rule(X[i]).follow.add(self.left)
-								if DEBUG: print "FOLLOW " + str(self.left) + "--> FOLLOW " + str(X[i])
 	def update_first(self, g):
 		while True:
 			tmp = self.first & g.Vn
@@ -154,12 +143,6 @@ class LL_table:
 			for P in rule.right:
 				for X in P: # P -> X0X1...Xn
 					if X in g.Vt:
-						if DEBUG and (rule.left,X) in self.table.keys(): 
-							print "!!!!! not LL1 grammar"
-							rle, idx = self.table[(rule.left,X)]
-							print rle.show_rule(idx)
-							print rule.show_rule(rule.right.index(P))
-							print "#####"
 						self.table[(rule.left,X)] = (rule, rule.right.index(P))
 							
 						break
@@ -169,12 +152,6 @@ class LL_table:
 							if a == 'epsilon':
 								no_eps = False
 							else:
-								if DEBUG and (rule.left,a) in self.table.keys(): 
-									print "!!!!! not LL1 grammar"
-									rle, idx = self.table[(rule.left,a)]
-									print rle.show_rule(idx)
-									print rule.show_rule(rule.right.index(P))
-									print "#####"
 								self.table[(rule.left,a)] = (rule, rule.right.index(P))
 						if no_eps:
 							break
@@ -185,12 +162,6 @@ class LL_table:
 						if 'epsilon' not in g.get_rule(X).first:
 							break # if eps not all Xi.first, then eps not in X0X1...Xn.first
 					for b in rule.follow:
-						if DEBUG and (rule.left,b) in self.table.keys(): 
-							print "!!!!! not LL1 grammar"
-							rle, idx = self.table[(rule.left,b)]
-							print rle.show_rule(idx)
-							print rule.show_rule(rule.right.index(P))
-							print "#####"
 						self.table[(rule.left,b)] = (rule, rule.right.index(P))
 	def show(self):
 		for i in self.table.keys():
@@ -261,7 +232,6 @@ def get_element(l, tag):
 def main():
 	# init input stream
 	r = read_XML(sys.argv[1]) # iFile
-	# r = stream([char(i, 'a') for i in "iaimi#"])
 	# init production rules
 	g = read_grammar('./grammar')
 	# init LL(1) parsing table
@@ -304,7 +274,6 @@ def main():
 					l.append(ET.SubElement(get_element(l, rule.left), item))
 				if item in ['ID', 'CONST']:
 					l.append(ET.SubElement(get_element(l, rule.left), item))
-					#l[-1].text = item
 				elif item in g.Vt:
 					l.append(ET.SubElement(get_element(l, rule.left), r.d[item][1]))
 					l[-1].text = r.d[item][0]
