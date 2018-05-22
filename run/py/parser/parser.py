@@ -123,7 +123,7 @@ class char:
 class stream:
 	def __init__(self, r):
 		self.r = r
-		self.d = {}
+		self.d = {} # namelist
 		for i in r:
 			self.d[i.value] = (i.text, i.type)
 	def show(self):
