@@ -45,7 +45,7 @@
     </token>
     <token>
       <number>7</number>
-      <value>a</value>
+      <value>i</value>
       <type>identifer</type>
       <line>2</line>
       <valid>True</valid>
@@ -59,7 +59,7 @@
     </token>
     <token>
       <number>9</number>
-      <value>1</value>
+      <value>0</value>
       <type>constant_int</type>
       <line>2</line>
       <valid>True</valid>
@@ -73,114 +73,219 @@
     </token>
     <token>
       <number>11</number>
-      <value>int</value>
+      <value>for</value>
       <type>keyword</type>
       <line>3</line>
       <valid>True</valid>
     </token>
     <token>
       <number>12</number>
-      <value>b</value>
-      <type>identifer</type>
+      <value>(</value>
+      <type>Sep_or_Operator</type>
       <line>3</line>
       <valid>True</valid>
     </token>
     <token>
       <number>13</number>
-      <value>=</value>
-      <type>Sep_or_Operator</type>
+      <value>i</value>
+      <type>identifer</type>
       <line>3</line>
       <valid>True</valid>
     </token>
     <token>
       <number>14</number>
-      <value>2</value>
-      <type>constant_int</type>
+      <value>=</value>
+      <type>Sep_or_Operator</type>
       <line>3</line>
       <valid>True</valid>
     </token>
     <token>
       <number>15</number>
+      <value>1</value>
+      <type>constant_int</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>16</number>
       <value>;</value>
       <type>Sep_or_Operator</type>
       <line>3</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>16</number>
-      <value>a</value>
-      <type>identifer</type>
-      <line>4</line>
-      <valid>True</valid>
-    </token>
-    <token>
       <number>17</number>
-      <value>=</value>
-      <type>Sep_or_Operator</type>
-      <line>4</line>
+      <value>i</value>
+      <type>identifer</type>
+      <line>3</line>
       <valid>True</valid>
     </token>
     <token>
       <number>18</number>
-      <value>a</value>
-      <type>identifer</type>
-      <line>4</line>
+      <value>&lt;</value>
+      <type>Sep_or_Operator</type>
+      <line>3</line>
       <valid>True</valid>
     </token>
     <token>
       <number>19</number>
-      <value>*</value>
+      <value>3</value>
+      <type>constant_int</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>20</number>
+      <value>;</value>
+      <type>Sep_or_Operator</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>21</number>
+      <value>i</value>
+      <type>identifer</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>22</number>
+      <value>=</value>
+      <type>Sep_or_Operator</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>23</number>
+      <value>i</value>
+      <type>identifer</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>24</number>
+      <value>+</value>
+      <type>Sep_or_Operator</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>25</number>
+      <value>1</value>
+      <type>constant_int</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>26</number>
+      <value>)</value>
+      <type>Sep_or_Operator</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>27</number>
+      <value>{</value>
+      <type>Sep_or_Operator</type>
+      <line>3</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>28</number>
+      <value>if</value>
+      <type>keyword</type>
+      <line>4</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>29</number>
+      <value>(</value>
       <type>Sep_or_Operator</type>
       <line>4</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>20</number>
-      <value>b</value>
+      <number>30</number>
+      <value>i</value>
       <type>identifer</type>
       <line>4</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>21</number>
-      <value>;</value>
+      <number>31</number>
+      <value>==</value>
       <type>Sep_or_Operator</type>
       <line>4</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>22</number>
+      <number>32</number>
+      <value>2</value>
+      <type>constant_int</type>
+      <line>4</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>33</number>
+      <value>)</value>
+      <type>Sep_or_Operator</type>
+      <line>4</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>34</number>
+      <value>{</value>
+      <type>Sep_or_Operator</type>
+      <line>4</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>35</number>
       <value>return</value>
       <type>keyword</type>
       <line>5</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>23</number>
-      <value>a</value>
+      <number>36</number>
+      <value>i</value>
       <type>identifer</type>
       <line>5</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>24</number>
+      <number>37</number>
       <value>;</value>
       <type>Sep_or_Operator</type>
       <line>5</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>25</number>
+      <number>38</number>
       <value>}</value>
       <type>Sep_or_Operator</type>
       <line>6</line>
       <valid>True</valid>
     </token>
     <token>
-      <number>26</number>
+      <number>39</number>
+      <value>}</value>
+      <type>Sep_or_Operator</type>
+      <line>7</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>40</number>
+      <value>}</value>
+      <type>Sep_or_Operator</type>
+      <line>8</line>
+      <valid>True</valid>
+    </token>
+    <token>
+      <number>41</number>
       <value>#</value>
       <type>#</type>
-      <line>7</line>
+      <line>9</line>
       <valid>True</valid>
     </token>
   </tokens>

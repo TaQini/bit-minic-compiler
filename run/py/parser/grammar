@@ -34,10 +34,11 @@ STMT_LIST -> epsilon
 # 语句：变量声明、返回、赋值、循环、分支、比较、函数调用
 STMT -> DECL_STMT
 STMT -> RTN_STMT
-STMT -> ASSIGN_STMT
+#STMT -> ASSIGN_STMT
 STMT -> ITER_STMT
 STMT -> SLCT_STMT
-STMT -> CMP_STMT
+#STMT -> CMP_STMT
+STMT -> ASSIGN_OR_CMP_STMT
 # STMT -> CALL_STMT
 
 # 变量声明语句
@@ -48,11 +49,29 @@ DECL_STMT1 -> epsilon
 # 返回语句
 RTN_STMT -> return EXPR ;
 
+# 消除赋值与比较语句的间接回溯
+ASSIGN_OR_CMP_STMT -> ID ASSIGN_OR_CMP_STMT1
+ASSIGN_OR_CMP_STMT1 -> ASSIGN_STMT
+ASSIGN_OR_CMP_STMT1 -> CMP_STMT
+
 # 赋值语句
-ASSIGN_STMT -> ID = EXPR ;
+ASSIGN_STMT -> = EXPR SUFFIX
+
+# 比较语句
+CMP_STMT -> CMP_OP EXPR SUFFIX
+CMP_OP ->  >
+CMP_OP ->  <
+CMP_OP ->  >=
+CMP_OP ->  <=
+CMP_OP ->  ==
+CMP_OP ->  !=
+
+# 后缀
+SUFFIX -> ;
+SUFFIX -> epsilon
 
 # 循环语句 for, while
-ITER_STMT -> for ( STMT ; STMT ; STMT ) CODE_BLOCK 
+ITER_STMT -> for ( STMT STMT STMT ) CODE_BLOCK 
 # ITER_STMT -> for ( STMT ; STMT ; STMT ) STMT
 # ITER_STMT -> while ( STMT ) CODE_BLOCK
 # ITER_STMT -> while ( STMT ) STMT
@@ -66,21 +85,6 @@ SLCT_STMT -> if ( STMT ) CODE_BLOCK
 # SLCT_STMT -> if ( STMT ) STMT else STMT
 # SLCT_STMT -> if ( STMT ) CODE_BLOCK else CODE_BLOCK
 # SLCT_STMT -> if ( STMT ) CODE_BLOCK else STMT
-
-# 比较语句
-#CMP_STMT -> EXPR OP EXPR
-#CMP_OP ->  >
-#CMP_OP ->  <
-#CMP_OP ->  >=
-#CMP_OP ->  <=
-#CMP_OP ->  ==
-#CMP_OP ->  !=
-#CMP_STMT -> EXPR > EXPR
-#CMP_STMT -> EXPR < EXPR
-#CMP_STMT -> EXPR >= EXPR
-#CMP_STMT -> EXPR <= EXPR
-#CMP_STMT -> EXPR == EXPR
-#CMP_STMT -> EXPR != EXPR
 
 # 调用语句
 # CALL_STMT -> ID ( ARG_LIST )

@@ -123,7 +123,7 @@ class char:
 class stream:
 	def __init__(self, r):
 		self.r = r
-		self.d = {} # namelist
+		self.d = {'epsilon':('eps','epsilon')} # namelist
 		for i in r:
 			self.d[i.value] = (i.text, i.type)
 	def show(self):
@@ -267,7 +267,7 @@ def main():
 			rule, index = t.query(tmp, r.d[r.p()][0])
 			if rule.start:
 				l.append(ET.SubElement(new_xml, rule.left))
-			for item in rule.right[index][::-1]:
+			for item in rule.right[index]:
 				if item == 'epsilon':
 					continue
 				if item in g.Vn:
