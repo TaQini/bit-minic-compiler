@@ -144,7 +144,6 @@ class LL_table:
 				for X in P: # P -> X0X1...Xn
 					if X in g.Vt:
 						self.table[(rule.left,X)] = (rule, rule.right.index(P))
-							
 						break
 					elif X in g.Vn:
 						no_eps = True
@@ -163,10 +162,6 @@ class LL_table:
 							break # if eps not all Xi.first, then eps not in X0X1...Xn.first
 					for b in rule.follow:
 						self.table[(rule.left,b)] = (rule, rule.right.index(P))
-	def show(self):
-		for i in self.table.keys():
-			rule, index = self.table[i]
-			print 'M('+i[0]+', '+i[1]+') = '+ rule.show_rule(index)
 	def query(self, Vn, Vt):
 		try:
 			rst = self.table[(Vn,Vt)]
@@ -174,6 +169,10 @@ class LL_table:
 			error(err)
 		else:
 			return rst
+	def show(self):
+		for i in self.table.keys():
+			rule, index = self.table[i]
+			print 'M('+i[0]+', '+i[1]+') = '+ rule.show_rule(index)
 # LL(1) parsing stack
 class stack:
 	def __init__(self, g):
